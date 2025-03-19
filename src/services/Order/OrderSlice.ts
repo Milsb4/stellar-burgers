@@ -1,15 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { TOrder } from '@utils-types';
-import { fetchOrder, getOrderByNumber } from './actions';
+import { fetchOrder, getOrderByNumber, fetchNewOrder } from './actions';
 
 export interface IOrderState {
   orderData: TOrder | null;
   orderRequest: boolean;
+  orders: TOrder[];
+  selectedOrder: TOrder | null;
 }
 
 export const initialState: IOrderState = {
   orderData: null,
-  orderRequest: false
+  orderRequest: false,
+  orders: [],
+  selectedOrder: null
 };
 
 export const orderSlice = createSlice({
@@ -22,28 +26,39 @@ export const orderSlice = createSlice({
   },
   selectors: {
     getOrderRequest: (state) => state.orderRequest,
-    getOrderModalData: (state) => state.orderData
+    getOrderModalData: (state) => state.orderData,
+    selectOrders: (state) => state.orders
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchNewOrder.pending, (state) => {
+        state.orderRequest = true;
+      })
+      .addCase(fetchNewOrder.rejected, (state) => {
+        state.orderRequest = false;
+      })
+      .addCase(fetchNewOrder.fulfilled, (state, action) => {
+        state.orderData = action.payload.order;
+        state.orderRequest = false;
+      })
       .addCase(fetchOrder.pending, (state) => {
         state.orderRequest = true;
       })
-      .addCase(fetchOrder.fulfilled, (state, action) => {
-        state.orderRequest = false;
-        state.orderData = action.payload;
-      })
       .addCase(fetchOrder.rejected, (state) => {
+        state.orderRequest = false;
+      })
+      .addCase(fetchOrder.fulfilled, (state, action) => {
+        state.orders = action.payload; // Заполняем список заказов
         state.orderRequest = false;
       })
       .addCase(getOrderByNumber.pending, (state) => {
         state.orderRequest = true;
       })
-      .addCase(getOrderByNumber.fulfilled, (state, { payload }) => {
-        state.orderRequest = false;
-        state.orderData = payload.orders[0];
-      })
       .addCase(getOrderByNumber.rejected, (state) => {
+        state.orderRequest = false;
+      })
+      .addCase(getOrderByNumber.fulfilled, (state, action) => {
+        state.selectedOrder = action.payload.orders[0];
         state.orderRequest = false;
       });
   }

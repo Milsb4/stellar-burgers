@@ -14,7 +14,7 @@ export const BurgerIngredient: FC<TBurgerIngredientProps> = memo(
     const ingredientCounts = useSelector(
       (state) => state.burgerConstructor.ingredientCounts
     );
-    const count = ingredientCounts[ingredient._id] || 0; // Получаем количество, если ингредиент добавлен, иначе 0
+    const count = ingredientCounts[ingredient._id]; // Получаем количество, если ингредиент добавлен, иначе 0
 
     const handleAdd = () => {
       dispatch(addIngredient({ ...ingredient }));

@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TIngredient, TConstructorIngredient } from '@utils-types';
 import { v4 as uuidv4 } from 'uuid';
+import { ingredientsSlice } from '../ingredients/ingredientSlice';
 
 export interface IBurgerConstructor {
   bun: TIngredient | null;
@@ -21,9 +22,22 @@ export const constructorSlice = createSlice({
     addIngredient: {
       reducer(state, action: PayloadAction<TConstructorIngredient>) {
         if (action.payload.type === 'bun') {
+          if (state.bun) {
+            state.ingredientCounts[state.bun._id] -= 2;
+
+            // Удаляем счетчик, если он стал равен 0
+            if (state.ingredientCounts[state.bun._id] <= 0) {
+              delete state.ingredientCounts[state.bun._id];
+            }
+          }
+
+          // Устанавливаем новую булку
           state.bun = action.payload;
+          state.ingredientCounts[action.payload._id] =
+            (state.ingredientCounts[action.payload._id] || 0) + 2;
         } else {
           state.ingredients.push(action.payload);
+          // Увеличиваем счетчик для ингредиента
           state.ingredientCounts[action.payload._id] =
             (state.ingredientCounts[action.payload._id] || 0) + 1;
         }
@@ -35,14 +49,22 @@ export const constructorSlice = createSlice({
     deleteIngredient: (state, action: PayloadAction<string>) => {
       const idToDelete = action.payload;
       // Удаляем ингредиент из массива ingredients
-      state.ingredients = state.ingredients.filter(
-        (ingredient) => ingredient.id !== idToDelete
+      const indexToDelete = state.ingredients.findIndex(
+        (ingredient) => ingredient.id === idToDelete
       );
-      // Уменьшаем счетчик
-      if (state.ingredientCounts[idToDelete]) {
-        state.ingredientCounts[idToDelete] -= 1;
-        if (state.ingredientCounts[idToDelete] <= 0) {
-          delete state.ingredientCounts[idToDelete];
+
+      if (indexToDelete !== -1) {
+        const ingredientToDelete = state.ingredients[indexToDelete];
+        state.ingredients.splice(indexToDelete, 1); // Удаляем ингредиент
+
+        // Уменьшаем счетчик
+        if (state.ingredientCounts[ingredientToDelete._id]) {
+          state.ingredientCounts[ingredientToDelete._id] -= 1;
+
+          // Удаляем счетчик, если он стал равен 0
+          if (state.ingredientCounts[ingredientToDelete._id] <= 0) {
+            delete state.ingredientCounts[ingredientToDelete._id];
+          }
         }
       }
     },
@@ -69,10 +91,17 @@ export const constructorSlice = createSlice({
     clearConstructor(state) {
       state.bun = null;
       state.ingredients = [];
+      state.ingredientCounts = {}; // Очищаем счетчики
     }
   },
   selectors: {
-    selectConstructorItems: (state: IBurgerConstructor) => state
+    selectConstructorItems: (state: IBurgerConstructor) => ({
+      bun: state.bun,
+      ingredients: state.ingredients,
+      ingredientCounts: Object.fromEntries(
+        Object.entries(state.ingredientCounts).filter(([_, count]) => count > 0)
+      )
+    })
   }
 });
 

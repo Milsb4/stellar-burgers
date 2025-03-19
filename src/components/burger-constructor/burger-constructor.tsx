@@ -7,7 +7,7 @@ import {
   getOrderModalData,
   getOrderRequest
 } from '../../services/Order/OrderSlice';
-import { fetchOrder } from '../../services/Order/actions';
+import { fetchNewOrder } from '../../services/Order/actions';
 import { useNavigate } from 'react-router-dom';
 import { getUserSelector } from '../../services/user/userSlice';
 
@@ -15,7 +15,6 @@ export const BurgerConstructor: FC = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserSelector);
   const navigate = useNavigate();
-  /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
   const constructorItems = useSelector((state) => state.burgerConstructor) || {
     bun: null,
     ingredients: []
@@ -40,7 +39,13 @@ export const BurgerConstructor: FC = () => {
       ),
       constructorItems.bun._id
     ];
-    dispatch(fetchOrder(ingredientDataId));
+    dispatch(
+      fetchNewOrder([
+        constructorItems.bun._id,
+        ...ingredientDataId,
+        constructorItems.bun._id
+      ])
+    );
   };
   const closeOrderModal = () => {
     dispatch(clearOrderModalData());

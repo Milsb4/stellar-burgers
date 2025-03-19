@@ -1,21 +1,20 @@
-import { getOrderByNumberApi, orderBurgerApi } from '@api';
+import { getOrderByNumberApi, orderBurgerApi, getOrdersApi } from '@api';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { clearConstructor } from '../burger-constructor/constructorslice';
 
+export const fetchNewOrder = createAsyncThunk(
+  'orders/newOrder',
+  async (data: string[]) => orderBurgerApi(data)
+);
+
 export const fetchOrder = createAsyncThunk(
-  'orderData/createOrder',
-  async (data: string[], { dispatch }) => {
-    const response = await orderBurgerApi(data);
-    if (response.success) {
-      dispatch(clearConstructor());
-    } else {
-      throw new Error('Ошибка создания заказа');
-    }
-    return response.order;
-  }
+  'orders/fetchOrders',
+  async () => await getOrdersApi() // Выполняем API запрос
 );
 
 export const getOrderByNumber = createAsyncThunk(
-  'order/getOrderByNumber',
-  getOrderByNumberApi
+  'orders/fetchOrderByNumber',
+  async (orderNumber: number) =>
+    // Здесь твой API запрос для получения заказа по номеру
+    await getOrderByNumberApi(orderNumber)
 );
