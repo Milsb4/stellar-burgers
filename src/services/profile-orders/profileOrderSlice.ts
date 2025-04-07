@@ -30,6 +30,7 @@ export const profileOrderSlice = createSlice({
       .addCase(getProfileOrder.fulfilled, (state, action) => {
         state.orders = action.payload;
         state.isLoading = false;
+        state.error = null;
       })
       .addCase(getProfileOrder.rejected, (state, action) => {
         state.isLoading = false;
@@ -39,3 +40,5 @@ export const profileOrderSlice = createSlice({
 });
 
 export const { selectProfileOrders } = profileOrderSlice.selectors;
+
+export const profileOrderSliceReducer = profileOrderSlice.reducer; 

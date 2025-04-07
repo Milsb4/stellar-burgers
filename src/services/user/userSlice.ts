@@ -9,7 +9,7 @@ import {
 } from './action';
 
 export interface UserState {
-  isLoadong: boolean;
+  isLoading: boolean;
   user: TUser | null;
   isAuthorized: boolean;
   isAuthChecked: boolean;
@@ -17,7 +17,7 @@ export interface UserState {
 }
 
 export const initialState: UserState = {
-  isLoadong: false,
+  isLoading: false,
   user: null,
   isAuthorized: false,
   isAuthChecked: false,
@@ -41,72 +41,72 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(registerUser.pending, (state) => {
-        state.isLoadong = true;
+      .addCase(registerUser.pending, (state) => { //pending
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, { error }) => {
-        state.isLoadong = false;
+        state.isLoading = false;
         state.error = error.message as string;
       })
       .addCase(registerUser.fulfilled, (state, { payload }) => {
-        state.isLoadong = false;
+        state.isLoading = false;
         state.error = null;
         state.user = payload.user;
         state.isAuthorized = true;
       })
-      .addCase(getUser.pending, (state) => {
-        state.isLoadong = true;
+      .addCase(getUser.pending, (state) => {  //pending
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(getUser.rejected, (state, { error }) => {
-        state.isLoadong = false;
+        state.isLoading = false;
         state.error = error.message as string;
       })
       .addCase(getUser.fulfilled, (state, { payload }) => {
-        state.isLoadong = false;
+        state.isLoading = false;
         state.error = null;
         state.isAuthorized = true;
         state.user = payload.user;
       })
-      .addCase(loginUser.pending, (state) => {
-        state.isLoadong = true;
+      .addCase(loginUser.pending, (state) => {  // pending
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, { error }) => {
-        state.isLoadong = false;
+        state.isLoading = false;
         state.error = error.message as string;
       })
       .addCase(loginUser.fulfilled, (state, { payload }) => {
-        state.isLoadong = false;
+        state.isLoading = false;
         state.error = null;
         state.user = payload.user;
         state.isAuthorized = true;
       })
-      .addCase(logoutUser.pending, (state) => {
-        state.isLoadong = true;
+      .addCase(logoutUser.pending, (state) => { //pending
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(logoutUser.rejected, (state, { error }) => {
-        state.isLoadong = false;
+        state.isLoading = false;
         state.error = error.message as string;
       })
       .addCase(logoutUser.fulfilled, (state, { payload }) => {
-        state.isLoadong = false;
+        state.isLoading = false;
         state.error = null;
         state.user = null;
         state.isAuthorized = false;
       })
-      .addCase(upDateUser.pending, (state) => {
-        state.isLoadong = true;
+      .addCase(upDateUser.pending, (state) => {  //pending
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(upDateUser.rejected, (state, { error }) => {
-        state.isLoadong = false;
+        state.isLoading = false;
         state.error = error.message as string;
       })
       .addCase(upDateUser.fulfilled, (state, { payload }) => {
-        state.isLoadong = false;
+        state.isLoading = false;
         state.error = null;
         state.user = payload.user;
         state.isAuthorized = true;
@@ -124,3 +124,4 @@ export const {
 } = userSlice.selectors;
 
 export const { checkUserStatus } = userSlice.actions;
+export const userSliceReducer = userSlice.reducer;
