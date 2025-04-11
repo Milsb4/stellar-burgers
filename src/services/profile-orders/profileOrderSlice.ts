@@ -41,4 +41,4 @@ export const profileOrderSlice = createSlice({
 
 export const { selectProfileOrders } = profileOrderSlice.selectors;
 
-export const profileOrderSliceReducer = profileOrderSlice.reducer; 
+export const profileOrderSliceReducer = profileOrderSlice.reducer;

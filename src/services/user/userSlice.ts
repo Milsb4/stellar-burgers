@@ -41,7 +41,8 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(registerUser.pending, (state) => { //pending
+      .addCase(registerUser.pending, (state) => {
+        //pending
         state.isLoading = true;
         state.error = null;
       })
@@ -55,7 +56,8 @@ export const userSlice = createSlice({
         state.user = payload.user;
         state.isAuthorized = true;
       })
-      .addCase(getUser.pending, (state) => {  //pending
+      .addCase(getUser.pending, (state) => {
+        //pending
         state.isLoading = true;
         state.error = null;
       })
@@ -69,7 +71,8 @@ export const userSlice = createSlice({
         state.isAuthorized = true;
         state.user = payload.user;
       })
-      .addCase(loginUser.pending, (state) => {  // pending
+      .addCase(loginUser.pending, (state) => {
+        // pending
         state.isLoading = true;
         state.error = null;
       })
@@ -83,7 +86,8 @@ export const userSlice = createSlice({
         state.user = payload.user;
         state.isAuthorized = true;
       })
-      .addCase(logoutUser.pending, (state) => { //pending
+      .addCase(logoutUser.pending, (state) => {
+        //pending
         state.isLoading = true;
         state.error = null;
       })
@@ -97,7 +101,8 @@ export const userSlice = createSlice({
         state.user = null;
         state.isAuthorized = false;
       })
-      .addCase(upDateUser.pending, (state) => {  //pending
+      .addCase(upDateUser.pending, (state) => {
+        //pending
         state.isLoading = true;
         state.error = null;
       })

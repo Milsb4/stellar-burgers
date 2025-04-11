@@ -1,124 +1,117 @@
-import { expect, it, describe } from '@jest/globals';
-import { configureStore } from '@reduxjs/toolkit';
+import { orderReducer, initialState } from './OrderSlice';
 import { fetchNewOrder, fetchOrder, getOrderByNumber } from './actions';
-import { orderReducer, IOrderState } from './OrderSlice';
-import {
-  getOrderByNumberApi,
-  orderBurgerApi,
-  getOrdersApi
-} from '../../utils/burger-api';
 
-jest.mock('../../utils/burger-api');
+describe('orderSlice', () => {
+  const ordersMock = [
+    {
+      _id: 'order1',
+      name: 'Order 1',
+      status: 'done',
+      ingredients: ['ingredient1', 'ingredient2'],
+      price: 300
+    },
+    {
+      _id: 'order2',
+      name: 'Order 2',
+      status: 'in-progress',
+      ingredients: ['ingredient3', 'ingredient4'],
+      price: 400
+    }
+  ];
 
-describe('OrderSlice', () => {
-  let store: ReturnType<typeof configureStore<RootState>>;
-  type RootState = {
-    order: IOrderState;
+  const orderMock = {
+    _id: 'order1',
+    name: 'Order 1',
+    status: 'done',
+    ingredients: ['ingredient1', 'ingredient2'],
+    price: 300
   };
 
-  beforeEach(() => {
-    store = configureStore({ reducer: { order: orderReducer } });
+  it('initialState', () => {
+    const state = orderReducer(undefined, { type: 'UNKNOWN_ACTION' });
+    expect(state).toEqual(initialState);
   });
-
-  //тесты fetchNewOrder
-
-  it('fetchNewOrder.pending', () => {
-    store.dispatch(fetchNewOrder.pending(''));
-
-    const state = store.getState().order;
-    expect(state.orderRequest).toBe(true);
-  });
-
-  it('fetchNewOrder.fulfilled', async () => {
-    const mockPayload = {
-      orderData: [{ id: 1, name: 'санчуальский бургер' }]
-    };
-
-    (orderBurgerApi as jest.Mock).mockResolvedValueOnce(mockPayload);
-    await store.dispatch(fetchNewOrder());
-
-    const state = store.getState().order;
-    expect(state.orderData).toEqual(mockPayload.order);
-    expect(state.orderRequest).toBe(false);
-  });
-
-  it('fetchNewOrder.rejected', async () => {
-    (orderBurgerApi as jest.Mock).mockRejectedValueOnce(
-      new Error('fetch failed')
-    );
-    await store.dispatch(fetchNewOrder());
-
-    const state = store.getState().order;
-    expect(state.orderRequest).toBe(false);
-  });
-
-  //тесты fetchOrder
 
   it('fetchOrder.pending', () => {
-    store.dispatch(fetchOrder.pending(''));
-
-    const state = store.getState().order;
+    const action = { type: fetchOrder.pending.type };
+    const state = orderReducer(initialState, action);
     expect(state.orderRequest).toBe(true);
+    expect(state.orders).toEqual([]);
   });
 
-  it('fetchOrder.fulfilled', async () => {
-    const mockPayload = {
-      orders: [
-        { id: 1, name: 'санчуальский бургер' },
-        { id: 2, name: 'бургер космический' }
-      ]
+  it(' fetchOrder.fulfilled', () => {
+    const action = {
+      type: fetchOrder.fulfilled.type,
+      payload: ordersMock
     };
 
-    (getOrdersApi as jest.Mock).mockResolvedValueOnce(mockPayload);
-    await store.dispatch(fetchOrder());
-
-    const state = store.getState().order;
-    expect(state.orders).toEqual(mockPayload);
+    const state = orderReducer(initialState, action);
+    expect(state.orders).toEqual(ordersMock);
     expect(state.orderRequest).toBe(false);
   });
 
-  it('fetchOrder.rejected', async () => {
-    (getOrdersApi as jest.Mock).mockRejectedValueOnce(
-      new Error('fetch failed')
-    );
-    await store.dispatch(fetchOrder());
-
-    const state = store.getState().order;
+  it('fetchOrder.rejected', () => {
+    const action = {
+      type: fetchOrder.rejected.type,
+      error: { message: 'fetch failed' }
+    };
+    const state = orderReducer(initialState, action);
     expect(state.orderRequest).toBe(false);
+    expect(state.orders).toEqual([]);
   });
-
-  //тесты getOrderByNumber
 
   it('getOrderByNumber.pending', () => {
-    store.dispatch(fetchOrder.pending(''));
+    const action = { type: getOrderByNumber.pending.type };
+    const state = orderReducer(initialState, action);
+    expect(state.orderRequest).toBe(true);
+    expect(state.selectedOrder).toBeNull();
+  });
 
-    const state = store.getState().order;
+  it('getOrderByNumber.fulfilled', () => {
+    const action = {
+      type: getOrderByNumber.fulfilled.type,
+      payload: { orders: [orderMock] }
+    };
+
+    const state = orderReducer(initialState, action);
+    expect(state.selectedOrder).toEqual(orderMock);
+    expect(state.orderRequest).toBe(false);
+  });
+
+  it('getOrderByNumber.rejected', () => {
+    const action = {
+      type: getOrderByNumber.rejected.type,
+      error: { message: 'fetch failed' }
+    };
+    const state = orderReducer(initialState, action);
+    expect(state.orderRequest).toBe(false);
+    expect(state.selectedOrder).toBeNull();
+  });
+
+  it('fetchNewOrder.pending', () => {
+    const action = { type: fetchNewOrder.pending.type };
+    const state = orderReducer(initialState, action);
     expect(state.orderRequest).toBe(true);
   });
 
-  it('getOrderByNumber.fulfilled', async () => {
-    const mockPayload = {
-      orders: [
-        { id: 1, name: 'санчуальский бургер' },
-        { id: 2, name: 'бургер космический' }
-      ]
+  it('fetchNewOrder.fulfilled', () => {
+    const action = {
+      type: fetchNewOrder.fulfilled.type,
+      payload: { order: orderMock }
     };
 
-    (getOrderByNumberApi as jest.Mock).mockResolvedValueOnce(mockPayload);
-    await store.dispatch(getOrderByNumber());
-
-    const state = store.getState().order;
-    expect(state.selectedOrder).toEqual(mockPayload.orders[0]);
+    const state = orderReducer(initialState, action);
+    expect(state.orderData).toEqual(orderMock);
     expect(state.orderRequest).toBe(false);
   });
 
-  it('getOrderByNumber.rejected', async () => {
-    (getOrderByNumberApi as jest.Mock).mockRejectedValueOnce(
-      new Error('fetch failed')
-    );
-    await store.dispatch(getOrderByNumber());
-
-    const state = store.getState().order;
+  it('fetchNewOrder.rejected', () => {
+    const action = {
+      type: fetchNewOrder.rejected.type,
+      error: { message: 'fetch failed' }
+    };
+    const state = orderReducer(initialState, action);
     expect(state.orderRequest).toBe(false);
+    expect(state.orderData).toBeNull();
   });
 });
