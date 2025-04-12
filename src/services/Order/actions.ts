@@ -1,4 +1,8 @@
-import { getOrderByNumberApi, orderBurgerApi, getOrdersApi } from '@api';
+import {
+  getOrderByNumberApi,
+  orderBurgerApi,
+  getOrdersApi
+} from '../../utils/burger-api';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { clearConstructor } from '../burger-constructor/constructorslice';
 

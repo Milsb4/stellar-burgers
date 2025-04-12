@@ -114,3 +114,5 @@ export const {
 } = constructorSlice.actions;
 
 export const { selectConstructorItems } = constructorSlice.selectors;
+
+export default constructorSlice.reducer;
