@@ -13,10 +13,15 @@ describe('E2E test', () => {
       cy.visit('http://localhost:4000/');
     });
     it('открытие и закрытие(крестик/оверлей)', () => {
-      const element = cy
-        .get(`[data-testid="category-buns"]`)
-        .contains('li', 'Краторная булка N-200i');
-      element.click();
+      cy.get(`[data-testid="category-buns"]`)
+        .contains('li', 'Краторная булка N-200i')
+        .as('element');
+      cy.get('[data-cy="modal-content"]').should('not.exist');
+      cy.get('@element').click();
+
+      cy.get('[data-cy="modal-content"]').within(() => {
+        cy.get('h3:last').should('have.text', 'Краторная булка N-200i');
+      });
 
       cy.get('[data-cy="modal-content"]').should('exist'); //проверка открыто ли модальное окно
 
@@ -26,7 +31,7 @@ describe('E2E test', () => {
 
       cy.get('[data-cy="modal-content"]').should('not.exist'); //проверка закрыто ли модальное окно
 
-      element.click();
+      cy.get('@element').click();
       cy.get('[data-cy="modal-content"]').should('exist');
 
       cy.get('[data-cy="modal-overlay"]').click({ force: true });
@@ -54,16 +59,32 @@ describe('E2E test', () => {
         .contains('button', 'Добавить')
         .click();
 
+      cy.get('[data-cy="bun-top"] div span span:first').should(
+        'have.text',
+        'Краторная булка N-200i (верх)'
+      );
+      cy.get('[data-cy="bun-bottom"] div span span:first').should(
+        'have.text',
+        'Краторная булка N-200i (низ)'
+      );
       cy.get(`[data-testid="category-mains"]`)
         .contains('button', 'Добавить')
         .click();
-
+      cy.get('section:last li:first div:last span span:first').should(
+        'have.text',
+        'Биокотлета из марсианской Магнолии'
+      );
       cy.get('[data-testid="category-sauces"]')
         .contains('button', 'Добавить')
         .click();
+      cy.get('section:last li:last div:last span span:first').should(
+        'have.text',
+        'Соус Spicy-X'
+      );
+
+      cy.get('[data-cy="modal-content"]').should('not.exist');
 
       cy.contains('button', 'Оформить заказ').click();
-
       cy.wait('@postOrders');
 
       cy.get('[data-cy="modal-content"]').within(() => {
